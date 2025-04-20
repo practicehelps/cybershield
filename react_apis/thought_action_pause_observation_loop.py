@@ -132,7 +132,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
                 return "Malicious"
 
         # Check if the response contains an "Answer" signal, indicating completion.
-        if "Answer" in resp or "Not malicious" in resp:
+        if "Answer" in resp:
           break
 
     return resp
