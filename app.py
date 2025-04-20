@@ -1,7 +1,7 @@
 import streamlit as st
 import pytesseract
 
-st.title("CyberShield - Coming Soon!")
+st.title("CyberShield - Coming Soon!!")
 
 input_file_present = st.selectbox('PDF Input file?', ('No', 'Yes'))
 st.write('You selected:', input_file_present)
