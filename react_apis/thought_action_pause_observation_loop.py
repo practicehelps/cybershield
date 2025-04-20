@@ -1,6 +1,7 @@
 # import the 'tool' decorator
 from langchain.tools import tool
 from agent.agent import EnhancedAgent
+import os
 # Define a system prompt that sets the behavior of the AI assistant.
 # Ensure the prompt includes guidelines on how responses should be structured.
 # Include rules for clarity, handling of sensitive information, and accuracy.
