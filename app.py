@@ -19,7 +19,7 @@ if input_file_present == "Yes":
 
     im = Image.open(image_file)
     text = pytesseract.image_to_string(im)
-    st.write("\nconverted text = %s\n" % text)
+    #st.write("\nconverted text = %s\n" % text)
 
     input_prompt = st.text_area(
         "Ask a question from the uploaded image:",
