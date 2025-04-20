@@ -89,7 +89,7 @@ class EnhancedPIIMasker(PIIMasker):
             'FAC': 'facility',
             'LOC': 'location',
             'PRODUCT': 'product',
-            'IP_ADDRESS': 'ip_address',
+            # 'IP_ADDRESS': 'ip_address', We can uncomment this after we unmask the PII response from openai
         }
 
     def mask_with_spacy(self, text: str) -> str:
