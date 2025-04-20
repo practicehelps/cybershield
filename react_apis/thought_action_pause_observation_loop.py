@@ -52,8 +52,7 @@ def truncate_response(response, max_length=1000):
 def malicious_ip_detection_virustotal(ip_address: str):
     """Search for maliciousness of the IP address.
     For any questions related to maliciousness of IP, this tool must be used."""
-
-    key = "7aa8b4f2563184fdc5e70dd08932a2dc16e08a710707a1095c0abff2279fbad1"
+    key = os.getenv("VIRUSTOTAL_KEY")
     #ip_address = "222.128.28.51"
     url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
     params = {'apikey': key, 'ip': ip_address}
