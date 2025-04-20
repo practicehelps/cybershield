@@ -1,5 +1,6 @@
 import uuid
 import re
+import spacy
 
 class PIIMasker:
     def __init__(self):
@@ -35,8 +36,7 @@ class PIIMasker:
               # Use regex to find occurrences of PII in the text.
               # while matches is not empty
               matches = re.findall(pattern, text)
-              print("matches = %s" % matches)
-
+              
               # Check if the matched PII has already been masked to avoid duplicate masking.
               # If not already masked, generate a unique placeholder using UUID.
               for match_str in matches:
@@ -76,8 +76,7 @@ class EnhancedPIIMasker(PIIMasker):
 
         # Load pre-trained SpaCy model
         self.nlp = spacy.load("en_core_web_sm")
-        #self.nlp = <TO_BE_FILLED>("en_core_web_lg") #spacy load model functions
-
+        
         # Additional PII entity types from SpaCy
         self.spacy_pii_types = {
             'PERSON': 'person',
