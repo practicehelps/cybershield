@@ -3,6 +3,8 @@ from langchain.tools import tool
 from agent.agent import EnhancedAgent
 import os
 import requests
+import streamlit as st
+
 # Define a system prompt that sets the behavior of the AI assistant.
 # Ensure the prompt includes guidelines on how responses should be structured.
 # Include rules for clarity, handling of sensitive information, and accuracy.
@@ -83,7 +85,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
         resp = agent.__call__(query)
 
         # Retrieve and print the response.
-        print("\nresponse is \n%s\n" % resp)
+        st.write("\n agent response from openai call: \n%s\n" % resp)
 
         # Check if the response contains a "PAUSE" signal indicating an action request.
         if "PAUSE" in resp:
@@ -107,7 +109,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
 
             if chosen_tool in tools.keys():
                 # Unmask PII in the extracted argument if necessary.
-                print("chosen tool %s found" % chosen_tool)
+                st.write("chosen tool %s found" % chosen_tool)
 
                 # Ensure the argument is properly formatted as a string for execution.
 
@@ -115,7 +117,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
                 resp = tools[chosen_tool](str(arg))
 
                 # Capture the tool's output and truncate it if necessary.
-                print("agent response is %s" % resp)
+                st.write("tool response is %s" % resp)
 
                 if resp is None:
                   print("Not malicious")
