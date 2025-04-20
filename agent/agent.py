@@ -8,7 +8,6 @@ class Agent:
     def __init__(self, system: str = ""):
         """Initialize the agent with an optional system message and PII masking support."""
         # initialize the openai connection
-        print("streamlit secrets = %s" % st.secrets)
         self.openai_client = OpenAI(
           # This is the default and can be omitted
           api_key=os.environ.get("OPENAI_API_KEY"),
