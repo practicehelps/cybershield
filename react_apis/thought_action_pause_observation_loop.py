@@ -69,14 +69,15 @@ def malicious_ip_detection_virustotal(ip_address: str):
 
 tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal}
 
-def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
+def thought_action_pause_observation_loop(max_iterations=10, query: str = "", context: str = ""):
     """Main interaction loop for the agent."""
 
     # Initialize the enhanced agent with the system prompt.
     agent = EnhancedAgent(system=system_prompt)
 
-    # Set the initial query and iteration counter.
-    query = query
+    # Set the initial query, context and iteration counter.
+    query = query + "\n" + context
+    results_so_far = ""
     i = 0
     while i < max_iterations:
         i += 1  # Increment the loop counter.
@@ -126,9 +127,10 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
 
                 # Mask PII in the tool result before sending it back into the loop.
                 masked_tool_resp = agent.mask(tool_resp)
+                results_so_far += ("\n" + masked_tool_resp) 
 
                 # Update the next prompt with the tool's output for further processing.                 
-                query = "\n Observation: %s " % masked_tool_resp
+                query = query + "\n results so far: %s " % results_so_far
 
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Answer" in resp:
