@@ -2,11 +2,13 @@ import openai
 import os
 from openai import OpenAI
 from pii_masker.pii_masker import PIIMasker, EnhancedPIIMasker
+import streamlit as st
 
 class Agent:
     def __init__(self, system: str = ""):
         """Initialize the agent with an optional system message and PII masking support."""
         # initialize the openai connection
+        print("streamlit secrets = %s" % st.secrets)
         self.openai_client = OpenAI(
           # This is the default and can be omitted
           api_key=os.environ.get("OPENAI_API_KEY"),
