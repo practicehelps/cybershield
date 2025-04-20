@@ -3,6 +3,7 @@ import streamlit as st
 import pytesseract
 from PIL import Image
 from react_apis import *
+from reach_apis.thought_action_pause_observation_loop import thought_action_pause_observation_loop
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
