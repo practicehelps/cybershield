@@ -1,3 +1,3 @@
 openai
 spacy
-pytesseract==0.3.8
+pytesseract
