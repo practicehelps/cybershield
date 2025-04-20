@@ -1,9 +1,9 @@
 import streamlit as st
 import pytesseract
 
-st.title("CyberShield - Coming Soon!!")
+st.title("CyberShield: Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
 
-input_file_present = st.selectbox('PDF Input file?', ('No', 'Yes'))
+input_file_present = st.selectbox('Image Input file?', ('No', 'Yes'))
 st.write('You selected:', input_file_present)
 
 input_txt = ""
