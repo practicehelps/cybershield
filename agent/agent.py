@@ -1,7 +1,7 @@
 import openai
 import os
 from openai import OpenAI
-from pii_masker import PIIMasker
+from pii_masker.pii_masker import PIIMasker, EnhancedPIIMasker
 
 class Agent:
     def __init__(self, system: str = ""):
