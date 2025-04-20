@@ -29,6 +29,6 @@ if input_file_present == "Yes":
     )
     if st.button("Submit"):
         st.write("Logic to detect the maliciousness of the IP is in progress. Please check back in a while. Thank you.")
-        response = thought_action_pause_observation_loop(input_prompt)
+        response = thought_action_pause_observation_loop(max_iterations=10, input_prompt)
         st.write("response from initial experimental run: %s" % response)
 
