@@ -61,7 +61,7 @@ def malicious_ip_detection_virustotal(ip_address: str):
     response = requests.get(url, params=params)
     print(response.json())
     response_json = response.json()
-    if response.status_code == 200 and len(response_json['detected_urls']) > 0:
+    if response.status_code == 200 and 'detected_urls' in response_json and len(response_json['detected_urls']) > 0:
         return response_json['detected_urls']
     return None
 
