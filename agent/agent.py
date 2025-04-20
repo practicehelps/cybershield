@@ -66,3 +66,13 @@ class Agent:
             # Handle errors that may occur during the API request.
             # Return a formatted error message with details.
             return e
+
+# Enhanced Agent class with improved PII masking capabilities.
+class EnhancedAgent(Agent):
+    def __init__(self, system: str = "") -> None:
+        """Initialize the agent with an enhanced PII masker and custom detection pipeline."""
+        # Call the parent class constructor to inherit existing functionality.
+        super().__init__(system)
+
+        # Initialize the enhanced PII masker with extended capabilities.
+        self.pii_masker = EnhancedPIIMasker()
