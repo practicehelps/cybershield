@@ -99,7 +99,6 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
             action_match = action_match.split(":")
             print("action match = %s" % action_match)
 
-        resp = ""
         if len(action_match) == 2:
             chosen_tool, arg = action_match[0].strip(), action_match[1].strip()  # Extract tool name and argument.
             print("chosen tool = %s, arg = %s" % (chosen_tool, arg))
@@ -114,22 +113,22 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
                 # Ensure the argument is properly formatted as a string for execution.
 
                 # Execute the tool using the provided argument.
-                resp = tools[chosen_tool](str(arg))
+                tool_resp = tools[chosen_tool](str(arg))
 
                 # Capture the tool's output and truncate it if necessary.
-                st.write("tool response is %s" % resp)
+                st.write("tool response is %s" % tool_resp)
 
-                if resp is None:
-                  print("Not malicious")
-                  return "Not malicious"
+                if tool_resp is None:
+                  print("No record found for IP %s" % arg)
+                  return "No record found for IP %s" % arg
 
-                resp = truncate_response(resp)
+                tool_resp = truncate_response(tool_resp)
 
                 # Mask PII in the tool result before sending it back into the loop.
+                masked_tool_resp = agent.mask(tool_resp)
 
-                # Update the next prompt with the tool's output for further processing.
-                print("Malicious")  
-                return "Malicious"
+                # Update the next prompt with the tool's output for further processing.                 
+                query = query + "\n Observation: %s " % masked_tool_resp
 
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Answer" in resp:
