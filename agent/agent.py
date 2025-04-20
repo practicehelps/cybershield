@@ -1,6 +1,7 @@
 import openai
 import os
 from openai import OpenAI
+from pii_masker import PIIMasker
 
 class Agent:
     def __init__(self, system: str = ""):
