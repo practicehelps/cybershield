@@ -55,6 +55,7 @@ class Agent:
             response = self.openai_client.chat.completions.create(
                 model="gpt-3.5-turbo", messages=self.messages
             )
+            print("openai response = %s" % response)
 
             # Extract and return the response content from the API's output.
             return response.choices[0].message.content
