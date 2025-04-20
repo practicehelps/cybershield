@@ -1,5 +1,6 @@
 import streamlit as st
 import pytesseract
+import time
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
