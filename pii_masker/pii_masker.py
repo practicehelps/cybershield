@@ -70,3 +70,63 @@ class PIIMasker:
         self.mask_map = {}
         self.unmask_map = {}
 
+class EnhancedPIIMasker(PIIMasker):
+    def __init__(self):
+        super().__init__()
+
+        # Load pre-trained SpaCy model
+        self.nlp = spacy.load("en_core_web_sm")
+        #self.nlp = <TO_BE_FILLED>("en_core_web_lg") #spacy load model functions
+
+        # Additional PII entity types from SpaCy
+        self.spacy_pii_types = {
+            'PERSON': 'person',
+            'ORG': 'organization',
+            'GPE': 'location',
+            'MONEY': 'money',
+            'DATE': 'date',
+            'TIME': 'time',
+            'NORP': 'nationality',
+            'FAC': 'facility',
+            'LOC': 'location',
+            'PRODUCT': 'product',
+            'IP_ADDRESS': 'ip_address',
+        }
+
+    def mask_with_spacy(self, text: str) -> str:
+        """Mask PII using SpaCy's named entity recognition"""
+
+        # mask PII using spacy
+        doc = self.nlp(text)
+
+        masked_text = text
+
+        # Sort entities by length to handle overlapping entities
+        entities = sorted(doc.ents, key=lambda x: len(x), reverse=True) #doc ents
+
+        for ent in entities:
+            if ent.label_ in self.spacy_pii_types:
+                print(f"Found PII entity: {ent.text} ({ent.label_})")
+                pii_value = ent.text
+
+                if pii_value not in self.mask_map:
+                    pii_type = self.spacy_pii_types[ent.label_]
+                    placeholder = f"<{pii_type}_{str(uuid.uuid4())[:8]}>"
+                    self.mask_map[pii_value] = placeholder
+                    self.unmask_map[placeholder] = pii_value
+
+                masked_text = masked_text.replace(pii_value, self.mask_map[pii_value]) #mask map
+
+        return masked_text
+
+    def mask(self, text: str) -> str:
+        """Combined masking using both regex and SpaCy"""
+        # First apply regex-based masking
+        masked_text = super().mask(text)
+
+        # Then apply SpaCy-based masking
+        masked_text = self.mask_with_spacy(masked_text) #masked text
+
+        return masked_text
+
+
