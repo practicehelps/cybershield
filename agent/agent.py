@@ -63,6 +63,7 @@ class Agent:
         except Exception as e:
             # Handle errors that may occur during the API request.
             # Return a formatted error message with details.
+            print("openai exception %s" % e)
             return e
 
 # Enhanced Agent class with improved PII masking capabilities.
