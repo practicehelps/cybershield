@@ -25,7 +25,6 @@ if input_file_present == "Yes":
         "Ask a question from the uploaded image:",
         "Pick any IP address from the image and detect if it is malicious",
     )
-    st.button("Submit", type="primary")
     if st.button("Submit"):
         st.write("Logic to detect the maliciousness of the IP is in progress. Please check back in a while. Thank you.")
 
