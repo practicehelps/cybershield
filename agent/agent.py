@@ -6,9 +6,6 @@ from pii_masker.pii_masker import PIIMasker, EnhancedPIIMasker
 class Agent:
     def __init__(self, system: str = ""):
         """Initialize the agent with an optional system message and PII masking support."""
-        # SET OPENAI_API_KEY from environment variables
-        os.environ.setdefault("OPENAI_API_KEY", "FROM ENV VARS")
-
         # initialize the openai connection
         self.openai_client = OpenAI(
           # This is the default and can be omitted
