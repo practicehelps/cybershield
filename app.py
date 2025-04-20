@@ -1,6 +1,7 @@
+import time
 import streamlit as st
 import pytesseract
-import time
+from PIL import Image
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
@@ -16,6 +17,7 @@ if input_file_present == "Yes":
     while image_file is None:
         time.sleep(1)
 
-    text = pytesseract.image_to_string(image_file)
+    im = Image.open(image_file)
+    text = pytesseract.image_to_string(im)
     st.write("\nconverted text = %s\n" % text)
 
