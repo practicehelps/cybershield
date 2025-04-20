@@ -128,7 +128,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = ""):
                 masked_tool_resp = agent.mask(tool_resp)
 
                 # Update the next prompt with the tool's output for further processing.                 
-                query = query + "\n Observation: %s " % masked_tool_resp
+                query = "\n Observation: %s " % masked_tool_resp
 
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Answer" in resp:
