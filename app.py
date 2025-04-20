@@ -2,6 +2,7 @@ import time
 import streamlit as st
 import pytesseract
 from PIL import Image
+from react_apis import *
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
@@ -27,4 +28,6 @@ if input_file_present == "Yes":
     )
     if st.button("Submit"):
         st.write("Logic to detect the maliciousness of the IP is in progress. Please check back in a while. Thank you.")
+        response = thought_action_pause_observation_loop(input_prompt)
+        st.write("response from initial experimental run: %s" % response)
 
