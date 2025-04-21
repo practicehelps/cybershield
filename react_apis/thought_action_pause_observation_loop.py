@@ -112,6 +112,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
     results_so_far = ""
     i = 0
     answers_confirmed = 0
+    action_match = []
     while i < max_iterations:
         i += 1  # Increment the loop counter.
 
