@@ -102,9 +102,13 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
 
     # Initialize the enhanced agent with the system prompt.
     agent = EnhancedAgent(system=system_prompt)
-
+    original_query = query
+    # extract just the ip addresses first
+    ip_list = agent.__call__("extract and return only the ip addresses from the given list: %s" % context)
+    st.write("IP list = %s" % ip_list)
+    
     # Set the initial query, context and iteration counter.
-    query = query + "\n" + "{context}:\n" + context + "\n{context}" + "\n only extract IP addresses from {context} block"
+    query = query + "\n" + ip_list
     results_so_far = ""
     i = 0
     answers_confirmed = 0
