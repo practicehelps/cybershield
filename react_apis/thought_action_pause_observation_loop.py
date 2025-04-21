@@ -154,7 +154,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
                 query = query + "\n answers found so far: %d" % answers_confirmed
 
         # Check if the response contains an "Answer" signal, indicating completion.
-        if "Answer" in resp:
+        if "Final Answer" in resp:
           break
 
     return resp
