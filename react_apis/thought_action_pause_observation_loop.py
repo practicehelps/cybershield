@@ -141,11 +141,12 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
 
                 # Capture the tool's output and truncate it if necessary.
                 st.write("tool response is %s" % tool_resp)
-
+                answers_confirmed += 1
+                
                 if tool_resp is None:
                   print("No record found for %s" % arg)                  
                   continue
-                answers_confirmed += 1
+                
                 tool_resp = truncate_response(tool_resp)
 
                 # Mask PII in the tool result before sending it back into the loop.
