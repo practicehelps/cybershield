@@ -104,7 +104,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
     agent = EnhancedAgent(system=system_prompt)
 
     # Set the initial query, context and iteration counter.
-    query = query + "\n" + context
+    query = query + "\n" + "{context}:\n" + context + "\n{context}" + "\n only extract IP addresses from {context} block"
     results_so_far = ""
     i = 0
     answers_confirmed = 0
