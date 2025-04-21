@@ -21,6 +21,9 @@ malicious_ip_detection_virustotal:
 e.g. malicious_ip_detection_virustotal: IP
 Performs a VirusTotal lookup for a IP.
 
+You can be asked to detect malicious IPs in one of the following two formats.
+
+Following is the format number 1 of the question:
 Question: Check if the IP 8.8.8.8 is malicious.
 Thought: I should perform a VirusTotal lookup for the IP.
 Action: malicious_ip_detection_virustotal: 8.8.8.8
@@ -30,7 +33,9 @@ You will be called again with this:
 Observation: {"data": "VirusTotal data for 8.8.8.8"}
 Thought: I think I have found the answer.
 Action: Final Answer: The IP 8.8.8.8 is malicious based on VirusTotal data.
+End of format number 1.
 
+Following is the format number 2 of the question:
 Question: Check if IP addresses 5.5.5.5 and 4.4.4.4 are malicious.
 Thought: I should perform a VirusTotal lookup for IP 5.5.5.5 first.
 Action: malicious_ip_detection_virustotal: 5.5.5.5
@@ -52,6 +57,7 @@ Action: Answer: The IP 4.4.4.4 is not malicious based on VirusTotal data.
 
 Thought: I have found answers for both the IP addresses.
 Action: Final Answer: IP 5.5.5.5 is malicious and IP 4.4.4.4 is not malicious.
+End of format number 2.
 
 Now it's your turn:
 """
