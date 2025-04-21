@@ -29,7 +29,29 @@ PAUSE
 You will be called again with this:
 Observation: {"data": "VirusTotal data for 8.8.8.8"}
 Thought: I think I have found the answer.
-Action: Answer: The IP 8.8.8.8 is malicious based on VirusTotal data.
+Action: Final Answer: The IP 8.8.8.8 is malicious based on VirusTotal data.
+
+Question: Check if IP addresses 5.5.5.5 and 4.4.4.4 are malicious.
+Thought: I should perform a VirusTotal lookup for IP 5.5.5.5 first.
+Action: malicious_ip_detection_virustotal: 5.5.5.5
+PAUSE
+
+You will be called again with this:
+Observation: {"data": "VirusTotal data for 5.5.5.5"}
+Thought: I think I have found one answer.
+Action: Answer: The IP 5.5.5.5 is malicious based on VirusTotal data.
+
+Thought: IP 5.5.5.5 is malicious. Now, I need to perform a VirusTotal lookup for 4.4.4.4
+Action: malicious_ip_detection_virustotal: 4.4.4.4
+PAUSE
+
+You will be called again with this:
+Observation: {"data": "IP 5.5.5.5 was already found to be malicious. VirusTotal data for 4.4.4.4"}
+Thought: I think I have found the next answer.
+Action: Answer: The IP 4.4.4.4 is not malicious based on VirusTotal data.
+
+Thought: I have found answers for both the IP addresses.
+Action: Final Answer: IP 5.5.5.5 is malicious and IP 4.4.4.4 is not malicious.
 
 Now it's your turn:
 """
@@ -79,6 +101,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
     query = query + "\n" + context
     results_so_far = ""
     i = 0
+    answers_confirmed = 0
     while i < max_iterations:
         i += 1  # Increment the loop counter.
 
@@ -120,17 +143,15 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
                 st.write("tool response is %s" % tool_resp)
 
                 if tool_resp is None:
-                  print("No record found for IP %s" % arg)
-                  return "No record found for IP %s" % arg
-
+                  print("No record found for %s" % arg)                  
+                  continue
+                answers_confirmed += 1
                 tool_resp = truncate_response(tool_resp)
 
                 # Mask PII in the tool result before sending it back into the loop.
-                masked_tool_resp = agent.mask(tool_resp)
-                results_so_far += ("\n" + masked_tool_resp) 
 
                 # Update the next prompt with the tool's output for further processing.                 
-                query = query + "\n results so far: %s " % results_so_far
+                query = query + "\n answers found so far: %d" % answers_confirmed
 
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Answer" in resp:
