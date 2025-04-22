@@ -2,6 +2,7 @@
 from langchain.tools import tool
 from agent.agent import EnhancedAgent
 import os
+import re
 import requests
 import streamlit as st
 
@@ -21,6 +22,11 @@ malicious_ip_detection_virustotal:
 e.g. malicious_ip_detection_virustotal: IP
 Performs a VirusTotal lookup for a IP.
 
+get_ip_address_from_text:
+e.g. get_ip_address_from_text: text
+Extracts IP addresses from text.
+
+When a text is provided, you can be asked to extract IP addresses from the text.
 You can be asked to detect malicious IPs in one of the following two formats.
 
 Following is the format number 1 of the question:
@@ -95,7 +101,13 @@ def malicious_ip_detection_virustotal(ip_address: str):
         return response_json['detected_urls']
     return None
 
-tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal}
+@tool
+def get_ip_address_from_text(text: str):
+    """Extract IP addresses from text."""
+    ip_list = re.findall(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', text)
+    return ip_list
+
+tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal, "get_ip_address_from_text": get_ip_address_from_text}
 
 def thought_action_pause_observation_loop(max_iterations=10, query: str = "", context: str = ""):
     """Main interaction loop for the agent."""
