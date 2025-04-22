@@ -30,6 +30,6 @@ if input_file_present == "Yes":
     # Pass the ip addresses list as the context to the input_prompt
     if st.button("Submit"):
         st.write("Logic to detect the maliciousness of the IP is in progress. Please check back in a while. Thank you.")
-        response = thought_action_pause_observation_loop(max_iterations=10, query=input_prompt, context=text)
+        response = thought_action_pause_observation_loop(max_iterations=20, query=input_prompt, context=text)
         st.write("response from initial experimental run: %s" % response)
 
