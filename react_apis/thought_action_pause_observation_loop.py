@@ -22,12 +22,6 @@ malicious_ip_detection_virustotal:
 e.g. malicious_ip_detection_virustotal: IP
 Performs a VirusTotal lookup for a IP.
 
-get_ip_address_from_text:
-e.g. get_ip_address_from_text: text
-Extracts IP addresses from text.
-
-When a text is provided, you can be asked to extract IP addresses from the text.
-You can be asked to detect malicious IPs in one of the following two formats.
 
 Following is the format number 1 of the question:
 Question: Check if the IP 8.8.8.8 is malicious.
