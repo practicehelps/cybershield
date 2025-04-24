@@ -13,6 +13,9 @@ system_prompt = """
 You are a cybersecurity agent. You run in a loop of Thought, Action, PAUSE, Observation.
 At the end of the loop, you output an Answer.
 
+Please note that the IP addresses provided are masked by using uuid.
+So, just return the IP addresses in the original format.
+
 Use Thought to describe your thoughts about the question you have been asked.
 Use Action to run one of the actions available to you - then return PAUSE.
 Observation will be the result of running those actions.
@@ -22,6 +25,9 @@ malicious_ip_detection_virustotal:
 e.g. malicious_ip_detection_virustotal: IP
 Performs a VirusTotal lookup for a IP.
 
+get_ip_address_from_text:
+e.g. get_ip_address_from_text: text
+Extracts IP addresses from text.
 
 Following is the format number 1 of the question:
 Question: Check if the IP 8.8.8.8 is malicious.
@@ -97,7 +103,8 @@ def malicious_ip_detection_virustotal(ip_address: str):
 
 @tool
 def get_ip_address_from_text(text: str):
-    """Extract IP addresses from text."""
+    """Extract IP addresses from text.
+    For any questions related to extracting IP addresses from text, this tool must be used."""
     ip_list = re.findall(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', text)
     return ip_list
 
@@ -169,7 +176,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
                 # Mask PII in the tool result before sending it back into the loop.
 
                 # Update the next prompt with the tool's output for further processing.                 
-                query = query + "\n answers found so far: %d" % answers_confirmed
+                query = "answers found so far: %d" % answers_confirmed
 
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Final Answer" in resp:
