@@ -79,7 +79,8 @@ class EnhancedPIIMasker(PIIMasker):
         super().__init__()
 
         # Load pre-trained SpaCy model
-        self.nlp = spacy.load("en_core_web_sm")
+        # TODO: need to fine-tune the model for the specific use case. Until then, let's skip this.
+        # self.nlp = spacy.load("en_core_web_sm")
         
         # Additional PII entity types from SpaCy
         self.spacy_pii_types = {
@@ -128,7 +129,8 @@ class EnhancedPIIMasker(PIIMasker):
         masked_text = super().mask(text)
 
         # Then apply SpaCy-based masking
-        masked_text = self.mask_with_spacy(masked_text) #masked text
+        # TODO: need to fine-tune the model for the specific use case. Until then, let's skip this.
+        # masked_text = self.mask_with_spacy(masked_text) #masked text
 
         return masked_text
 
