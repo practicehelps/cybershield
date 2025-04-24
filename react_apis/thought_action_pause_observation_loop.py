@@ -95,9 +95,14 @@ def malicious_ip_detection_virustotal(ip_address: str):
     url = 'https://www.virustotal.com/vtapi/v2/ip-address/report'
     params = {'apikey': key, 'ip': ip_address}
     response = requests.get(url, params=params)
-    st.write("response from virus total:\n%s" % response.json())
+    if response is None or response.status_code != 200:
+       return None
+    
+    st.write("json response from virus total:\n%s" % response.json())
     response_json = response.json()
+
     if response.status_code == 200 and 'detected_urls' in response_json and len(response_json['detected_urls']) > 0:
+        response_json = response.json()
         return response_json['detected_urls']
     return None
 
@@ -138,7 +143,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
         # Check if the response contains a "PAUSE" signal indicating an action request.
         if "PAUSE" in resp:
           # Use a regular expression to extract the requested action and its argument.
-          action_match = resp.split("\n")[1]
+          action_match = resp.split("PAUSE")[0]
           action_match = action_match.split("Action:")
           if len(action_match) < 2:
             continue
