@@ -54,7 +54,7 @@ class Agent:
         try:
             # Call OpenAI's chat completion API using the stored conversation history.
             response = self.openai_client.chat.completions.create(
-                model="gpt-3.5-turbo", messages=self.messages
+                model="gpt-4-turbo", messages=self.messages
             )
             print("openai response = %s" % response)
 
