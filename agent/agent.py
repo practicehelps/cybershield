@@ -39,13 +39,13 @@ class Agent:
             response = self.execute()
 
             # Apply PII masking to the received response before returning it.
-            masked_response = self.pii_masker.mask(response)
+            #masked_response = self.pii_masker.mask(response)
 
             # Append the masked assistant response to the conversation history.
-            self.messages.append({"role": "assistant", "content": masked_response})
+            self.messages.append({"role": "assistant", "content": response})
 
             # Call PII unmasking to masked response
-            unmasked_response = self.pii_masker.unmask(masked_response)
+            unmasked_response = self.pii_masker.unmask(response)
 
             return unmasked_response
 

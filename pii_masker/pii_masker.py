@@ -66,7 +66,6 @@ class PIIMasker:
             text = text.replace(placeholder, self.unmask_map[placeholder])
 
         # Return the unmasked text. 
-        st.write("unmasked text:\n%s" % text)
         return text
 
     def clear(self):
