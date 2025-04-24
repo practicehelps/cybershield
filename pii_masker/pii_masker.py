@@ -1,6 +1,7 @@
 import uuid
 import re
 import spacy
+import streamlit as st
 
 class PIIMasker:
     def __init__(self):
@@ -12,6 +13,8 @@ class PIIMasker:
         # Define regex patterns for different types of PII.
         # Ensure the patterns cover common formats (e.g., email, phone, IP address, credit card, SSN).
         self.ssn_regex = ["\d{3}-\d{2}-\d{4}"]
+
+    
         self.ip_regex = ["\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"]
         self.credit_card_regex = ["^\d{4}-\d{4}-\d{4}-\d{4}"]
         self.phone_regex = ["\d{3}-\d{3}-\d{4}"]
@@ -50,6 +53,7 @@ class PIIMasker:
                   self.unmask_map[placeholder] = match_str
 
         # Return the masked text
+        st.write("masked text:\n%s" % text)
         return text
 
     def unmask(self, text: str) -> str:
@@ -61,7 +65,8 @@ class PIIMasker:
         for placeholder in sorted_placeholders:
             text = text.replace(placeholder, self.unmask_map[placeholder])
 
-        # Return the unmasked text.
+        # Return the unmasked text. 
+        st.write("unmasked text:\n%s" % text)
         return text
 
     def clear(self):
