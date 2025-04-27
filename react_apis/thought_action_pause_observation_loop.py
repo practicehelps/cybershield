@@ -16,6 +16,8 @@ At the end of the loop, you output an Answer.
 Please note that the IP addresses provided are masked by using uuid.
 So, just return the IP addresses in the original format.
 
+The final answer should clearly state the IP addresses and whether they are malicious or not.
+
 Use Thought to describe your thoughts about the question you have been asked.
 Use Action to run one of the actions available to you - then return PAUSE.
 Observation will be the result of running those actions.
@@ -36,7 +38,7 @@ Action: malicious_ip_detection_virustotal: 8.8.8.8
 PAUSE
 
 You will be called again with this:
-Observation: {"data": "VirusTotal data for 8.8.8.8"}
+Observation: {"data": "tool response is The IP address 8.8.8.8 is malicious based on the following URLs"}
 Thought: I think I have found the answer.
 Action: Final Answer: The IP 8.8.8.8 is malicious based on VirusTotal data.
 End of format number 1.
@@ -48,7 +50,7 @@ Action: malicious_ip_detection_virustotal: 5.5.5.5
 PAUSE
 
 You will be called again with this:
-Observation: {"data": "VirusTotal data for 5.5.5.5"}
+Observation: {"data": tool response is The IP address  5.5.5.5 is malicious based on the following URLs"}
 Thought: I think I have found one answer.
 Action: Answer: The IP 5.5.5.5 is malicious based on VirusTotal data.
 
@@ -57,7 +59,7 @@ Action: malicious_ip_detection_virustotal: 4.4.4.4
 PAUSE
 
 You will be called again with this:
-Observation: {"data": "IP 5.5.5.5 was already found to be malicious. VirusTotal data for 4.4.4.4"}
+Observation: {"data": "tool response is The IP address 4.4.4.4 is not malicious based on the following URLs"}
 Thought: I think I have found the next answer.
 Action: Answer: The IP 4.4.4.4 is not malicious based on VirusTotal data.
 
@@ -103,8 +105,9 @@ def malicious_ip_detection_virustotal(ip_address: str):
 
     if response.status_code == 200 and 'detected_urls' in response_json and len(response_json['detected_urls']) > 0:
         response_json = response.json()
-        return response_json['detected_urls']
-    return None
+        return "The IP address %s is malicious based on the following URLs: %s" % (ip_address, response_json['detected_urls'])
+        
+    return "Ip address %s is not malicious" % ip_address
 
 @tool
 def get_ip_address_from_text(text: str):
@@ -131,7 +134,12 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
     i = 0
     answers_confirmed = 0
     action_match = []
+    resp = ""
     while i < max_iterations:
+        # Check if the response contains an "Answer" signal, indicating completion.
+        if "Final Answer" in resp:
+          break
+        
         i += 1  # Increment the loop counter.
 
         # Process the current prompt using the agent.
