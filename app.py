@@ -25,7 +25,7 @@ if input_file_present == "Yes":
 
     input_prompt = st.text_area(
         "Ask a question from the uploaded image:",
-        "Pick any IP address from the image and detect if it is malicious",
+        "Pick any IP address from the list and detect if it is malicious",
     )
     # Pass the ip addresses list as the context to the input_prompt
     if st.button("Submit"):
