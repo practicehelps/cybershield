@@ -1,6 +1,6 @@
 import uuid
 import re
-import spacy
+#import spacy
 import streamlit as st
 
 class PIIMasker:

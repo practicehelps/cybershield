@@ -1,15 +1,21 @@
 # import the 'tool' decorator
 from langchain.tools import tool
-from agent.agent import EnhancedAgent
+from agent_malicious_ip_detection.agent import EnhancedAgent
+from agent_web_tavily.agent import AgentWebTavily
+from langchain_community.tools.tavily_search import TavilySearchResults
+from orchestrator.orchestrator import Orchestrator
+
 import os
 import re
 import requests
 import streamlit as st
 
+
+
 # Define a system prompt that sets the behavior of the AI assistant.
 # Ensure the prompt includes guidelines on how responses should be structured.
 # Include rules for clarity, handling of sensitive information, and accuracy.
-system_prompt = """
+system_prompt_malicious_ip_detector = """
 You are a cybersecurity agent. You run in a loop of Thought, Action, PAUSE, Observation.
 At the end of the loop, you output an Answer.
 
@@ -70,6 +76,58 @@ End of format number 2.
 Now it's your turn:
 """
 
+system_prompt_tavily = """
+You are a web search agent, also called a tavily agent. You run in a loop of Thought, Action, PAUSE, Observation.
+At the end of the loop, you output an Answer.
+
+For any questions not related to maliciousness of IP addresses, you must use the search_tavily tool.
+
+Use Thought to describe your thoughts about the question you have been asked.
+Use Action to run one of the actions available to you - then return PAUSE.
+Observation will be the result of running those actions.
+
+Your available actions are:
+search_tavily:
+e.g. search_tavily: query
+Performs a web search using the TavilySearchResults tool for the given query.
+
+
+Following is the format of the question:
+Question: Check the latest news on the stock market.
+Thought: I should perform a web search for the latest news on the stock market.
+Action: search_tavily: latest news on the stock market
+PAUSE
+
+You will be called again with this:
+Observation: {"data": "web search results"}
+Thought: I think I have found the answer.
+Action: Final Answer: web search results
+
+Now it's your turn:
+"""
+
+# classify the query and route it to the appropriate agent
+ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
+web_agent = AgentWebTavily(system_prompt=system_prompt_tavily)
+
+agents = [ip_agent, web_agent]
+
+system_prompt_orchestrator = f"""
+You are an orchestrator. You are responsible for orchestrating the agents.
+You will be given a query and you will need to determine which agent to route the query to.
+You have the following agents available to you:
+
+
+You are an expert intent classifier.
+You need will use the user's input to classify the intent and select the appropriate agent.                
+
+Here are the available agents and their descriptions:
+{", ".join([f"- {agent.name}: {agent.description}" for agent in agents])}
+
+Return the agent name in the response.
+
+"""
+
 def truncate_response(response, max_length=1000):
     """Truncate and format API responses to prevent token limit issues."""
 
@@ -116,20 +174,34 @@ def get_ip_address_from_text(text: str):
     ip_list = re.findall(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', text)
     return ip_list
 
-tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal, "get_ip_address_from_text": get_ip_address_from_text}
+@tool
+def search_tavily(query: str):
+    """Search the web for information."""
+    # Create an instance of TavilySearchResults with customized parameters
+    search_tool = TavilySearchResults(
+        max_results=5,  # Retrieves up to 5 search results
+        include_answer=True,  # Includes direct answers when available
+        include_raw_content=True,  # Includes full raw text content from search results
+        include_images=True,  # Includes images from the search results
+    )
+
+    # Invoke the search with the given query and return the results
+    return search_tool.invoke(query)    
+
+tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal, "get_ip_address_from_text": get_ip_address_from_text, "search_tavily": search_tavily}
+agent_names_to_agent_map = {"malicious_ip_detection": ip_agent, "web_search": web_agent}
 
 def thought_action_pause_observation_loop(max_iterations=10, query: str = "", context: str = ""):
     """Main interaction loop for the agent."""
 
-    # Initialize the enhanced agent with the system prompt.
-    agent = EnhancedAgent(system=system_prompt)
-    original_query = query
-    # extract just the ip addresses first
-    ip_list = agent.__call__("extract and return only the ip addresses from the given list: %s" % context)
-    st.write("IP list = %s" % ip_list)
-    
-    # Set the initial query, context and iteration counter.
-    query = query + "\n" + ip_list
+    # first call the orchestrator to get the agent name
+    orchestrator = Orchestrator(system=system_prompt_orchestrator)
+    resp = orchestrator.__call__(query + "\n\n" + context + "\n\n" + "Please select the agent to route the query to.")
+    st.write("orchestrator response: %s" % resp)
+
+    agent_name = resp.strip()
+    agent = agent_names_to_agent_map[agent_name]
+
     results_so_far = ""
     i = 0
     answers_confirmed = 0

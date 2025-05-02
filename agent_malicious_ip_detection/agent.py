@@ -4,8 +4,10 @@ from openai import OpenAI
 from pii_masker.pii_masker import PIIMasker, EnhancedPIIMasker
 import streamlit as st
 
-class Agent:
+class MaliciousIpDetectorAgent:
     def __init__(self, system: str = ""):
+        self.name = "malicious_ip_detector"
+        self.description = "Execute a malicious ip detection using the virustotal api."
         """Initialize the agent with an optional system message and PII masking support."""
         # initialize the openai connection
         self.openai_client = OpenAI(
@@ -68,11 +70,13 @@ class Agent:
             return e
 
 # Enhanced Agent class with improved PII masking capabilities.
-class EnhancedAgent(Agent):
+class EnhancedAgent(MaliciousIpDetectorAgent):
     def __init__(self, system: str = "") -> None:
         """Initialize the agent with an enhanced PII masker and custom detection pipeline."""
         # Call the parent class constructor to inherit existing functionality.
         super().__init__(system)
+        self.name = "malicious_ip_detection"
+        self.description = "Execute a malicious ip detection using the virustotal api."
 
         # Initialize the enhanced PII masker with extended capabilities.
         self.pii_masker = EnhancedPIIMasker()
