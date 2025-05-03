@@ -1,6 +1,6 @@
 from openai import OpenAI
 import os
-
+import streamlit as st
 class Orchestrator:
     def __init__(self, system: str = ""):
         self.system = system
@@ -28,10 +28,11 @@ class Orchestrator:
 
         # Call the OpenAI API to generate a response.
         response = self.execute()        
-        print("orchestrator response = %s" % response)
+        st.write("orchestrator response = %s" % response)
 
         # Add the response to the message history.
-        self.messages.append({"role": "assistant", "content": response.choices[0].message.content})
+        self.messages.append({"role": "assistant", "content": response})
+        return response
 
     def execute(self):
         """Send messages to OpenAI's API and retrieve the response."""
@@ -40,7 +41,7 @@ class Orchestrator:
             response = self.openai_client.chat.completions.create(
                 model="gpt-4-turbo", messages=self.messages
             )
-            print("openai response = %s" % response)
+            st.write("openai response from orchestrator = %s" % response)
 
             # Extract and return the response content from the API's output.
             return response.choices[0].message.content

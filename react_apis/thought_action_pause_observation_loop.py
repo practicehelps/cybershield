@@ -91,24 +91,37 @@ search_tavily:
 e.g. search_tavily: query
 Performs a web search using the TavilySearchResults tool for the given query.
 
-
-Following is the format of the question:
+Following is an example question:
 Question: Check the latest news on the stock market.
 Thought: I should perform a web search for the latest news on the stock market.
 Action: search_tavily: latest news on the stock market
 PAUSE
 
 You will be called again with this:
-Observation: {"data": "web search results"}
+Observation: {"data": "stock market today is doing well"}
 Thought: I think I have found the answer.
-Action: Final Answer: web search results
+Action: Final Answer: stock market today is doing well
+
+End of example question 1.
+
+Here is another example question:
+Question: What is the weather in Tokyo?
+Thought: I should perform a web search for the weather in Tokyo.
+Action: search_tavily: weather in Tokyo
+PAUSE
+
+You will be called again with this:
+Observation: {"data": "Weather in Tokyo is sunny and warm with a temperature of 25 degrees Celsius."}
+Thought: I think I have found the answer.
+Action: Final Answer: Weather in Tokyo is sunny and warm with a temperature of 25 degrees Celsius.
+End of example question 2.
 
 Now it's your turn:
 """
 
 # classify the query and route it to the appropriate agent
 ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
-web_agent = AgentWebTavily(system_prompt=system_prompt_tavily)
+web_agent = AgentWebTavily(system=system_prompt_tavily)
 
 agents = [ip_agent, web_agent]
 
@@ -201,6 +214,8 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
 
     agent_name = resp.strip()
     agent = agent_names_to_agent_map[agent_name]
+    if agent_name == "malicious_ip_detection":
+       query = query + "\n" + context
 
     results_so_far = ""
     i = 0
@@ -261,7 +276,7 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
                 # Mask PII in the tool result before sending it back into the loop.
 
                 # Update the next prompt with the tool's output for further processing.                 
-                query = "answers found so far: %d" % answers_confirmed
+                query =  tool_resp + "\n" + "answers found so far: %d" % answers_confirmed
 
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Final Answer" in resp:
