@@ -4,6 +4,7 @@ from agent_malicious_ip_detection.agent import EnhancedAgent
 from agent_web_tavily.agent import AgentWebTavily
 from langchain_community.tools.tavily_search import TavilySearchResults
 from orchestrator.orchestrator import Orchestrator
+from concurrent.futures import ThreadPoolExecutor
 
 import os
 import re
@@ -126,19 +127,19 @@ web_agent = AgentWebTavily(system=system_prompt_tavily)
 agents = [ip_agent, web_agent]
 
 system_prompt_orchestrator = f"""
-You are an orchestrator. You are responsible for orchestrating the agents.
-You will be given a query and you will need to determine which agent to route the query to.
-You have the following agents available to you:
-
-
-You are an expert intent classifier.
-You need will use the user's input to classify the intent and select the appropriate agent.                
+You are an expert agent classifier.
+You need will use the user's input and select the appropriate agents to route the query to.
 
 Here are the available agents and their descriptions:
 {", ".join([f"- {agent.name}: {agent.description}" for agent in agents])}
 
-Return the agent name in the response.
+If the query is related to maliciousness of IP addresses, you must use the malicious_ip_detection agent.
+If the query is not related to maliciousness of IP addresses, you must use the web_search agent.
 
+If the query needs both the malicious_ip_detection and web_search agents, you return the malicious_ip_detection agent first,
+then return the web_search agent.
+
+Return the agent names in the response, separated by a comma.
 """
 
 def truncate_response(response, max_length=1000):
@@ -178,7 +179,7 @@ def malicious_ip_detection_virustotal(ip_address: str):
         response_json = response.json()
         return "The IP address %s is malicious based on the following URLs: %s" % (ip_address, response_json['detected_urls'])
         
-    return "Ip address %s is not malicious" % ip_address
+    return "Ip address %s is not malicious. Detailed response from VirusTotal: %s" % (ip_address, response.json())
 
 @tool
 def get_ip_address_from_text(text: str):
@@ -202,26 +203,36 @@ def search_tavily(query: str):
     return search_tool.invoke(query)    
 
 tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal, "get_ip_address_from_text": get_ip_address_from_text, "search_tavily": search_tavily}
-agent_names_to_agent_map = {"malicious_ip_detection": ip_agent, "web_search": web_agent}
 
 def thought_action_pause_observation_loop(max_iterations=10, query: str = "", context: str = ""):
-    """Main interaction loop for the agent."""
+    agent_names_to_agent_map = {"malicious_ip_detection": ip_agent, "web_search": web_agent}
+    
 
     # first call the orchestrator to get the agent name
     orchestrator = Orchestrator(system=system_prompt_orchestrator)
     resp = orchestrator.__call__(query + "\n\n" + context + "\n\n" + "Please select the agent to route the query to.")
     st.write("orchestrator response: %s" % resp)
 
-    agent_name = resp.strip()
-    agent = agent_names_to_agent_map[agent_name]
-    if agent_name == "malicious_ip_detection":
-       query = query + "\n" + context
+    # remove the white spaces and split the response by comma
+    agent_names = resp.strip().split(",")
+    agent_names = [name.strip() for name in agent_names]
+    resp = ""
 
-    results_so_far = ""
+    responses = []
+
+    # get the response from the agents in parallel
+    with ThreadPoolExecutor(max_workers=len(agent_names)) as executor:
+        futures = [executor.submit(get_response, agent_names_to_agent_map[agent_name], query + "\n" + context, max_iterations) for agent_name in agent_names]
+        responses = [future.result() for future in futures]
+
+    return responses
+
+def get_response(agent, query, max_iterations):
     i = 0
     answers_confirmed = 0
-    action_match = []
+    action_match = []    
     resp = ""
+    tool_resp = ""
     while i < max_iterations:
         # Check if the response contains an "Answer" signal, indicating completion.
         if "Final Answer" in resp:
@@ -258,8 +269,6 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
                 # Unmask PII in the extracted argument if necessary.
                 st.write("chosen tool %s found" % chosen_tool)
 
-                # Ensure the argument is properly formatted as a string for execution.
-
                 # Execute the tool using the provided argument.
                 tool_resp = tools[chosen_tool](str(arg))
 
@@ -273,8 +282,6 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
                 
                 tool_resp = truncate_response(tool_resp)
 
-                # Mask PII in the tool result before sending it back into the loop.
-
                 # Update the next prompt with the tool's output for further processing.                 
                 query =  tool_resp + "\n" + "answers found so far: %d" % answers_confirmed
 
@@ -282,6 +289,5 @@ def thought_action_pause_observation_loop(max_iterations=10, query: str = "", co
         if "Final Answer" in resp:
           break
 
-    return resp
-
-
+    return resp + "\n" + "tool response that was used: " + tool_resp
+    

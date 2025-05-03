@@ -40,9 +40,6 @@ class MaliciousIpDetectorAgent:
             # Call the execution method to get a response from the OpenAI API.
             response = self.execute()
 
-            # Apply PII masking to the received response before returning it.
-            #masked_response = self.pii_masker.mask(response)
-
             # Append the masked assistant response to the conversation history.
             self.messages.append({"role": "assistant", "content": response})
 
