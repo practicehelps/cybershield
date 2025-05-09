@@ -3,9 +3,9 @@ import streamlit as st
 import pytesseract
 from PIL import Image
 from agent_system_prompts import *
-from agent_malicious_ip_detection import EnhancedAgent
-from orchestrator import Orchestrator
-from agent_web_tavily import AgentWebTavily
+from agent_malicious_ip_detection.agent import EnhancedAgent
+from orchestrator.orchestrator import Orchestrator
+from agent_web_tavily.agent import AgentWebTavily
 from agent_system_prompts.agent_system_prompts import *
 
 # classify the query and route it to the appropriate agent

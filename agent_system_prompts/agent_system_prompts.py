@@ -39,7 +39,7 @@ Action: malicious_ip_detection_virustotal: 8.8.8.8
 PAUSE
 
 You will be called again with this:
-Observation: {"data": "tool response is The IP address 8.8.8.8 is malicious based on the following URLs"}
+Observation: {"data": "tool response is The IP address 8.8.8.8 is malicious."}
 Thought: I think I have found the answer.
 Action: Final Answer: The IP 8.8.8.8 is malicious based on VirusTotal data.
 End of format number 1.
@@ -60,7 +60,7 @@ Action: malicious_ip_detection_virustotal: 4.4.4.4
 PAUSE
 
 You will be called again with this:
-Observation: {"data": "tool response is The IP address 4.4.4.4 is not malicious based on the following URLs"}
+Observation: {"data": "tool response is The IP address 4.4.4.4 is not malicious."}
 Thought: I think I have found the next answer.
 Action: Answer: The IP 4.4.4.4 is not malicious based on VirusTotal data.
 

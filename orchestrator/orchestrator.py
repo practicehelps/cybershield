@@ -1,13 +1,14 @@
 from openai import OpenAI
 import os
 import streamlit as st
-from utils import truncate_response
+from utils.utils import truncate_response
 from tools.tools import *
 from concurrent.futures import ThreadPoolExecutor
 
 class Orchestrator:
     def __init__(self, agent_names_to_agent_map):
         self.agent_names_to_agent_map = agent_names_to_agent_map
+        print("agent map values = %s" % agent_names_to_agent_map.values())
         self.system = self.get_system_prompt(agent_names_to_agent_map.values())
 
         # initialize the openai connection
@@ -23,7 +24,7 @@ class Orchestrator:
         if self.system:
             self.messages.append({"role": "system", "content": self.system})      
 
-    def get_system_prompt(agents):
+    def get_system_prompt(self, agents):
         return f"""
         You are an expert agent classifier.
         You need will use the user's input and select the appropriate agents to route the query to.
@@ -97,6 +98,7 @@ class Orchestrator:
         action_match = []    
         resp = ""
         tool_resp = ""
+        output = st.text("")
         while i < max_iterations:
             # Check if the response contains an "Answer" signal, indicating completion.
             if "Final Answer" in resp:
@@ -108,7 +110,7 @@ class Orchestrator:
             resp = agent.__call__(query)
 
             # Retrieve and print the response.
-            st.write("\n agent response from openai call: \n%s\n" % resp)
+            output.text("\n agent response from openai call: \n%s\n" % resp)
 
             # Check if the response contains a "PAUSE" signal indicating an action request.
             if "PAUSE" in resp:
@@ -131,13 +133,13 @@ class Orchestrator:
 
                     if chosen_tool in all_tools.keys():
                         # Unmask PII in the extracted argument if necessary.
-                        st.write("chosen tool %s found" % chosen_tool)
+                        output.text("chosen tool %s found" % chosen_tool)
 
                         # Execute the tool using the provided argument.
                         tool_resp = all_tools[chosen_tool](str(arg))
 
                         # Capture the tool's output and truncate it if necessary.
-                        st.write("tool response is %s" % tool_resp)
+                        output.text("tool response is %s" % tool_resp)
                         answers_confirmed += 1
                         
                         if tool_resp is None:
@@ -153,6 +155,8 @@ class Orchestrator:
             if "Final Answer" in resp:
                 break
 
-        return resp + "\n" + "tool response that was used: " + tool_resp
+        resp = self.__call__(resp + "\n" + "Summarize the given content.")
+
+        return resp
         
             
