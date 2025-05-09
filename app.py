@@ -2,8 +2,16 @@ import time
 import streamlit as st
 import pytesseract
 from PIL import Image
-from react_apis import *
-from react_apis.thought_action_pause_observation_loop import thought_action_pause_observation_loop
+from agent_system_prompts import *
+from agent_malicious_ip_detection import EnhancedAgent
+from orchestrator import Orchestrator
+from agent_web_tavily import AgentWebTavily
+from agent_system_prompts.agent_system_prompts import *
+
+# classify the query and route it to the appropriate agent
+ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
+web_agent = AgentWebTavily(system=system_prompt_tavily)
+agent_names_to_agent_map = {"malicious_ip_detection": ip_agent, "web_search": web_agent}
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
@@ -29,6 +37,8 @@ if input_file_present == "Yes":
     )
     # Pass the ip addresses list as the context to the input_prompt
     if st.button("Submit"):
-        response = thought_action_pause_observation_loop(max_iterations=10, query=input_prompt, context=text)
+        orchestrator = Orchestrator(agent_names_to_agent_map)
+
+        response = orchestrator.thought_action_pause_observation_loop(max_iterations=10, query=input_prompt, context=text)
         st.write("Final response: %s" % response)
 
