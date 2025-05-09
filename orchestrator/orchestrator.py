@@ -4,11 +4,12 @@ import streamlit as st
 from utils.utils import truncate_response
 from tools.tools import *
 from concurrent.futures import ProcessPoolExecutor
+from tenacity import (retry, retry_if_exception_type, stop_after_attempt,
+                      wait_fixed)
 
 class Orchestrator:
     def __init__(self, agent_names_to_agent_map):
         self.agent_names_to_agent_map = agent_names_to_agent_map
-        print("agent map values = %s" % agent_names_to_agent_map.values())
         self.system = self.get_system_prompt(agent_names_to_agent_map.values())
 
         # initialize the openai connection
@@ -63,7 +64,6 @@ class Orchestrator:
             response = self.openai_client.chat.completions.create(
                 model="gpt-4-turbo", messages=self.messages
             )
-            st.write("openai response from orchestrator = %s" % response)
 
             # Extract and return the response content from the API's output.
             return response.choices[0].message.content
@@ -85,14 +85,20 @@ class Orchestrator:
         agent_names = [name.strip() for name in agent_names]
         resp = ""
 
-        responses = []
+        # TODO: get the response from the agents in parallel
+        # Streamlit has problems with parallel tasks.
+        final_response = ""
 
-        # get the response from the agents in parallel
-        with ProcessPoolExecutor(max_workers=len(agent_names)) as executor:
-            futures = [executor.submit(self.get_response, self.agent_names_to_agent_map[agent_name], query + "\n" + context, max_iterations) for agent_name in agent_names]
-            responses = [future.result() for future in futures]
+        for agent in agent_names:
+            agent_obj = self.agent_names_to_agent_map[agent]
+            response = self.get_response(agent_obj, query + "\n" + context, max_iterations)
+            st.write("Here is the message history of all calls to LLM to answer the question:", "Agent" + agent_obj.name, agent_obj.messages)
 
-        return responses
+            final_response += response
+
+        resp = self.__call__(final_response + "\n" + "Summarize the given content.")
+        return resp
+
 
     def get_response(self, agent, query, max_iterations):
         i = 0
@@ -100,11 +106,10 @@ class Orchestrator:
         action_match = []    
         resp = ""
         tool_resp = ""
-        output = st.text("")
         while i < max_iterations:
             # Check if the response contains an "Answer" signal, indicating completion.
             if "Final Answer" in resp:
-                break
+                return resp
             
             i += 1  # Increment the loop counter.
 
@@ -112,7 +117,7 @@ class Orchestrator:
             resp = agent.__call__(query)
 
             # Retrieve and print the response.
-            output.text("\n agent response from openai call: \n%s\n" % resp)
+            st.write("\n orchestrator agent response from openai call: \n%s\n" % resp)
 
             # Check if the response contains a "PAUSE" signal indicating an action request.
             if "PAUSE" in resp:
@@ -135,14 +140,13 @@ class Orchestrator:
 
                     if chosen_tool in all_tools.keys():
                         # Unmask PII in the extracted argument if necessary.
-                        output.text("chosen tool %s found" % chosen_tool)
+                        st.write("chosen tool %s found" % chosen_tool)
 
                         # Execute the tool using the provided argument.
                         tool_resp = all_tools[chosen_tool](str(arg))
 
                         # Capture the tool's output and truncate it if necessary.
-                        output.text("tool response is %s" % tool_resp)
-                        answers_confirmed += 1
+                        st.write("tool response is %s" % tool_resp)
                         
                         if tool_resp is None:
                             print("No record found for %s" % arg)                  
@@ -151,14 +155,12 @@ class Orchestrator:
                         tool_resp = truncate_response(tool_resp)
 
                         # Update the next prompt with the tool's output for further processing.                 
-                        query =  tool_resp + "\n" + "answers found so far: %d" % answers_confirmed
+                        query =  tool_resp
 
             # Check if the response contains an "Answer" signal, indicating completion.
             if "Final Answer" in resp:
-                break
-
-        resp = self.__call__(resp + "\n" + "Summarize the given content.")
+                return resp
 
         return resp
         
-            
+                

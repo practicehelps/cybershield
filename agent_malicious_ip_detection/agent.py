@@ -36,7 +36,7 @@ class MaliciousIpDetectorAgent:
 
             # Append the masked user message to the conversation history.
             self.messages.append({"role": "user", "content": masked_message})
-            print(self.messages)
+            #st.write("Malicious IP Detector agent called. Here is the message history so far:", self.messages)
             # Call the execution method to get a response from the OpenAI API.
             response = self.execute()
 
@@ -55,7 +55,6 @@ class MaliciousIpDetectorAgent:
             response = self.openai_client.chat.completions.create(
                 model="gpt-4-turbo", messages=self.messages
             )
-            print("openai response = %s" % response)
 
             # Extract and return the response content from the API's output.
             return response.choices[0].message.content
@@ -72,7 +71,7 @@ class EnhancedAgent(MaliciousIpDetectorAgent):
         """Initialize the agent with an enhanced PII masker and custom detection pipeline."""
         # Call the parent class constructor to inherit existing functionality.
         super().__init__(system)
-        self.name = "malicious_ip_detection"
+        self.name = "malicious_ip_detection_virustotal"
         self.description = "Execute a malicious ip detection using the virustotal api."
 
         # Initialize the enhanced PII masker with extended capabilities.

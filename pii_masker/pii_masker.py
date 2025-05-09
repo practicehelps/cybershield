@@ -43,7 +43,10 @@ class PIIMasker:
               # Check if the matched PII has already been masked to avoid duplicate masking.
               # If not already masked, generate a unique placeholder using UUID.
               for match_str in matches:
-                if match_str not in self.mask_map:
+                if match_str in self.mask_map:
+                    placeholder = self.mask_map[match_str]
+                    text = text.replace(match_str, placeholder)
+                else:
                   placeholder = str(uuid.uuid4())
                   # Replace the original PII with the placeholder in the text.
                   text = text.replace(match_str, placeholder)

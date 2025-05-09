@@ -11,7 +11,7 @@ from agent_system_prompts.agent_system_prompts import *
 # classify the query and route it to the appropriate agent
 ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
 web_agent = AgentWebTavily(system=system_prompt_tavily)
-agent_names_to_agent_map = {"malicious_ip_detection": ip_agent, "web_search": web_agent}
+agent_names_to_agent_map = {"malicious_ip_detection_virustotal": ip_agent, "web_search": web_agent}
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
@@ -29,7 +29,6 @@ if input_file_present == "Yes":
 
     im = Image.open(image_file)
     text = pytesseract.image_to_string(im)
-    st.write("\nconverted text = %s\n" % text)
 
     input_prompt = st.text_area(
         "Ask a question from the uploaded image:",

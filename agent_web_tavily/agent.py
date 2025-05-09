@@ -5,6 +5,7 @@ from openai import OpenAI
 # Import necessary classes from LangChain for Tavily integration
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.tools import tool
+import streamlit as st
 
 """
 Executes a web search using the TavilySearchResults tool.
@@ -36,10 +37,11 @@ class AgentWebTavily:
     def __call__(self, query: str):
 
         self.messages.append({"role": "user", "content": query})
+        #st.write("Web agent tavily called. Here is the message history so far:", self.messages)
 
         # Call OpenAI's chat completion API using the stored conversation history.
         response = self.execute()
-        print("openai response = %s" % response)
+        #st.write("openai response from web search via tavily= %s" % response)
  
         self.messages.append({"role": "assistant", "content": response})
         return response
@@ -52,6 +54,7 @@ class AgentWebTavily:
             response = self.openai_client.chat.completions.create(
                 model="gpt-4-turbo", messages=self.messages
             )   
+            # st.write("tavily response = %s", response)
             return response.choices[0].message.content
         except Exception as e:
             print("openai exception %s" % e)
