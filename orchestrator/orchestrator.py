@@ -3,7 +3,7 @@ import os
 import streamlit as st
 from utils.utils import truncate_response
 from tools.tools import *
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 
 class Orchestrator:
     def __init__(self, agent_names_to_agent_map):
@@ -39,6 +39,8 @@ class Orchestrator:
         then return the web_search agent.
 
         Return the agent names in the response, separated by a comma.
+
+        Also, you might be asked to summarize some content. Please do that if requested.
         """    
 
     def __call__(self, message=""):
@@ -86,7 +88,7 @@ class Orchestrator:
         responses = []
 
         # get the response from the agents in parallel
-        with ThreadPoolExecutor(max_workers=len(agent_names)) as executor:
+        with ProcessPoolExecutor(max_workers=len(agent_names)) as executor:
             futures = [executor.submit(self.get_response, self.agent_names_to_agent_map[agent_name], query + "\n" + context, max_iterations) for agent_name in agent_names]
             responses = [future.result() for future in futures]
 
