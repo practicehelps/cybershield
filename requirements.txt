@@ -10,3 +10,4 @@ pydantic
 mcp
 fastapi
 fastapi[standard]
+shodan

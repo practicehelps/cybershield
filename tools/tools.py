@@ -6,6 +6,7 @@ import requests
 import streamlit as st
 import re
 import os
+#import shodan
 
 @tool
 def malicious_ip_detection_virustotal(ip_address: str):
@@ -49,4 +50,27 @@ def search_tavily(query: str):
     # Invoke the search with the given query and return the results
     return search_tool.invoke(query)    
 
-all_tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal, "get_ip_address_from_text": get_ip_address_from_text, "search_tavily": search_tavily}
+@tool
+def get_city_from_ip(query: str):
+    """Get the city from the IP address"""
+    # key = os.getenv("SHODAN_API_KEY")
+    # api = shodan.Shodan(os.environ.get("SHODAN_API_KEY"))
+    # host = api.host(query)
+    # return host.get('city', 'n/a')
+    return str(requests.get(f"https://www.shodan.io/host/{query}").content)
+
+@tool
+def get_vulnerabilities_for_ip(query: str):
+    """ Get the vulns associated with the ip address"""
+    # key = os.getenv("SHODAN_API_KEY")
+    # api = shodan.Shodan(os.environ.get("SHODAN_API_KEY"))
+    # host = api.host(query)
+    # return host.get('city', 'n/a')
+    return str(requests.get(f"https://internetdb.shodan.io/{query}").content)
+
+
+
+all_tools = {"malicious_ip_detection_virustotal": malicious_ip_detection_virustotal, "get_ip_address_from_text": get_ip_address_from_text,
+             "get_city_from_ip": get_city_from_ip,
+             "get_vulnerabilities_for_ip": get_vulnerabilities_for_ip,
+             "search_tavily": search_tavily}

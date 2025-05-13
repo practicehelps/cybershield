@@ -94,7 +94,9 @@ class Orchestrator:
         for agent in agent_names:
             agent_obj = self.agent_names_to_agent_map[agent]
             response = self.get_response(agent_obj, query + "\n" + context, max_iterations)
-            st.write("Here is the message history of all calls to LLM to answer the question:", "Agent" + agent_obj.name, agent_obj.messages)
+            st.write("response from agent", agent)
+            st.write(response)
+            #st.write("Here is the message history of all calls to LLM to answer the question:", "Agent" + agent_obj.name, agent_obj.messages)
 
             final_response += response
 

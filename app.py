@@ -9,9 +9,6 @@ from agent_web_tavily.agent import AgentWebTavily
 from agent_shodan.agent import AgentShodan
 from agent_system_prompts.agent_system_prompts import *
 
-# Session state to keep track of history
-if "history" not in st.session_state:
-    st.session_state["history"] = []
 
 # Try spawning the fastapi service in the background
 import subprocess
@@ -47,10 +44,7 @@ if input_file_present == "Yes":
     )
     # Pass the ip addresses list as the context to the input_prompt
     if st.button("Submit"):
-        st.session_state["history"].append({"role":"user", "content":input_prompt + "\n" + text})
-
         orchestrator = Orchestrator(agent_names_to_agent_map)
-
         response = orchestrator.thought_action_pause_observation_loop(max_iterations=10, query=input_prompt, context=text)
         st.write("Final response: %s" % response)
 

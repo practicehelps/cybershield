@@ -27,14 +27,16 @@ class AgentShodan:
         self.description = "Executes geography search and cve search for a given ip address."
         self.system = system
         self.instructions = system
-        st.session_state["history"].append({"role":"system", "content": self.instructions})
+        self.messages = []
+        self.messages.append({"role":"system", "content": self.instructions})
 
     def __call__(self, query: str):
         # Build MCP payload
-        st.write("streamlit history", st.session_state["history"])
+        self.messages.append({"role": "user", "content": query})
+        st.write("shodan history", self.messages)
         mcp_context = MCPContext(
             user={"id": "0", "role": "user"},
-            history=st.session_state["history"],
+            history=self.messages,
             instructions=self.instructions,
             llm_model="gpt-4-turbo",
         )
@@ -45,8 +47,8 @@ class AgentShodan:
 
         if response.status_code == 200:
             reply = response.json()["FastMCP Reply"]
-            st.session_state["history"].append({"role":"assistant", "content": reply})
-        else:
-            st.error("Failed to contact MCP server.")
- 
+            self.messages.append({"role":"assistant", "content": reply})
+            return reply
+        
+        st.error("Failed to contact MCP server.")
         return response
