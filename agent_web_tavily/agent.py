@@ -28,7 +28,6 @@ class AgentWebTavily:
         # Initialize an empty message list to track conversation history.
         self.messages = []
 
-
         # If a system message is provided, add it to the message history with the "system" role.
         if self.system:
             self.messages.append({"role": "system", "content": self.system})

@@ -6,12 +6,19 @@ from agent_system_prompts import *
 from agent_malicious_ip_detection.agent import EnhancedAgent
 from orchestrator.orchestrator import Orchestrator
 from agent_web_tavily.agent import AgentWebTavily
+from agent_shodan.agent import AgentShodan
 from agent_system_prompts.agent_system_prompts import *
+
+# Session state to keep track of history
+if "history" not in st.session_state:
+    st.session_state["history"] = []
 
 # classify the query and route it to the appropriate agent
 ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
 web_agent = AgentWebTavily(system=system_prompt_tavily)
-agent_names_to_agent_map = {"malicious_ip_detection_virustotal": ip_agent, "web_search": web_agent}
+shodan_agent = AgentShodan(system=system_prompt_shodan)
+agent_names_to_agent_map = {"malicious_ip_detection_virustotal": ip_agent, "web_search": web_agent,
+                            "geography_and_vulnerabilities_for_ip": shodan_agent}
 
 st.title("CyberShield")
 st.write("Upload an image containing IP addresses. Let the agent use multiple data sources/tools like virus total, shodan to answer questions like malaciousness or ip reputation")
@@ -36,6 +43,8 @@ if input_file_present == "Yes":
     )
     # Pass the ip addresses list as the context to the input_prompt
     if st.button("Submit"):
+        st.session_state["history"].append({"role":"user", "content":input_prompt + "\n" + text})
+
         orchestrator = Orchestrator(agent_names_to_agent_map)
 
         response = orchestrator.thought_action_pause_observation_loop(max_iterations=10, query=input_prompt, context=text)

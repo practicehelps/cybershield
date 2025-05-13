@@ -28,16 +28,18 @@ class Orchestrator:
     def get_system_prompt(self, agents):
         return f"""
         You are an expert agent classifier.
-        You need will use the user's input and select the appropriate agents to route the query to.
+        You will use the user's input and select the appropriate agents to route the query to.
 
         Here are the available agents and their descriptions:
         {", ".join([f"- {agent.name}: {agent.description}" for agent in agents])}
 
         If the query is related to maliciousness of IP addresses, you must use the malicious_ip_detection agent.
-        If the query is not related to maliciousness of IP addresses, you must use the web_search agent.
+        If the query is related to the geography and vulnerabilities for a specific IP address, you must first use the malicious_ip_detection agent,
+        and then use the geography_and_vulnerabilities_for_ip agent.
+        For all other queries, you must use the web_search agent.
 
-        If the query needs both the malicious_ip_detection and web_search agents, you return the malicious_ip_detection agent first,
-        then return the web_search agent.
+        If the query needs  malicious_ip_detection,  geography_and_vulnerabilities_for_ip and web_search agents, you return the malicious_ip_detection agent first,
+        folowed by geography_and_vulnerabilities_for_ip agent, followed by the web_search agent.
 
         Return the agent names in the response, separated by a comma.
 
