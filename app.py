@@ -13,6 +13,10 @@ from agent_system_prompts.agent_system_prompts import *
 if "history" not in st.session_state:
     st.session_state["history"] = []
 
+# Try spawning the fastapi service in the background
+import subprocess
+subprocess.Popen(["fastapi","run","mcp_server/app.py"])
+
 # classify the query and route it to the appropriate agent
 ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
 web_agent = AgentWebTavily(system=system_prompt_tavily)

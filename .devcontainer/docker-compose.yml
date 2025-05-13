@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: streamlit
+    container_name: cybershield
+    command: bash -c "fastapi run ./mcp_server/app.py& && streamlit run app.py server.port=8501 --server.address=0.0.0.0"
+    volumes:
+      - ..:/usr/src
+    ports:
+      - "8501:8501"

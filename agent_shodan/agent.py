@@ -44,7 +44,7 @@ class AgentShodan:
         response = requests.post("http://localhost:8000/shodan", json=mcp_context.model_dump())
 
         if response.status_code == 200:
-            reply = response.json()["reply"]
+            reply = response.json()["FastMCP Reply"]
             st.session_state["history"].append({"role":"assistant", "content": reply})
         else:
             st.error("Failed to contact MCP server.")
