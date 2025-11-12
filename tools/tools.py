@@ -8,7 +8,7 @@ import re
 import os
 #import shodan
 
-@tool
+#@tool
 def malicious_ip_detection_virustotal(ip_address: str):
     """Search for maliciousness of the IP address.
     For any questions related to maliciousness of IP, this tool must be used."""
@@ -29,14 +29,14 @@ def malicious_ip_detection_virustotal(ip_address: str):
         
     return "Ip address %s is not malicious. Detailed response from VirusTotal: %s" % (ip_address, response.json())
 
-@tool
+#@tool
 def get_ip_address_from_text(text: str):
     """Extract IP addresses from text.
     For any questions related to extracting IP addresses from text, this tool must be used."""
     ip_list = re.findall(r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b', text)
     return ip_list
 
-@tool
+#@tool
 def search_tavily(query: str):
     """Search the web for information."""
     # Create an instance of TavilySearchResults with customized parameters
@@ -50,7 +50,7 @@ def search_tavily(query: str):
     # Invoke the search with the given query and return the results
     return search_tool.invoke(query)    
 
-@tool
+#@tool
 def get_city_from_ip(query: str):
     """Get the city from the IP address"""
     # key = os.getenv("SHODAN_API_KEY")
@@ -59,7 +59,7 @@ def get_city_from_ip(query: str):
     # return host.get('city', 'n/a')
     return str(requests.get(f"https://www.shodan.io/host/{query}").content)
 
-@tool
+#@tool
 def get_vulnerabilities_for_ip(query: str):
     """ Get the vulns associated with the ip address"""
     # key = os.getenv("SHODAN_API_KEY")
