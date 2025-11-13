@@ -9,11 +9,6 @@ from agent_web_tavily.agent import AgentWebTavily
 from agent_shodan.agent import AgentShodan
 from agent_system_prompts.agent_system_prompts import *
 
-
-# Try spawning the fastapi service in the background
-import subprocess
-subprocess.Popen(["fastapi","run","mcp_server/app.py"])
-
 # classify the query and route it to the appropriate agent
 ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
 web_agent = AgentWebTavily(system=system_prompt_tavily)
