@@ -53,7 +53,7 @@ class Orchestrator:
 
         # Call the OpenAI API to generate a response.
         response = self.execute()        
-        st.write("orchestrator response = %s" % response)
+        #st.write("orchestrator response = %s" % response)
 
         # Add the response to the message history.
         self.messages.append({"role": "assistant", "content": response})
@@ -80,7 +80,7 @@ class Orchestrator:
         # Pass the query to the orchestrator. It follows the Workflow: Orchestrator-workers design pattern
         # Ref: https://www.anthropic.com/engineering/building-effective-agents
         resp = self.__call__(query + "\n\n" + context + "\n\n" + "Please select the agent to route the query to.")
-        st.write("orchestrator response: %s" % resp)
+        #st.write("orchestrator response: %s" % resp)
 
         # remove the white spaces and split the response by comma
         agent_names = resp.strip().split(",")
@@ -121,7 +121,7 @@ class Orchestrator:
             resp = agent.__call__(query)
 
             # Retrieve and print the response.
-            st.write("\n orchestrator agent response from openai call: \n%s\n" % resp)
+            #st.write("\n orchestrator agent response from openai call: \n%s\n" % resp)
 
             # Check if the response contains a "PAUSE" signal indicating an action request.
             if "PAUSE" in resp:
@@ -133,11 +133,11 @@ class Orchestrator:
                 else:
                     action_match = action_match[1]
                     action_match = action_match.split(":")
-                    print("action match = %s" % action_match)
+                    #print("action match = %s" % action_match)
 
                 if len(action_match) == 2:
                     chosen_tool, arg = action_match[0].strip(), action_match[1].strip()  # Extract tool name and argument.
-                    print("chosen tool = %s, arg = %s" % (chosen_tool, arg))
+                    #print("chosen tool = %s, arg = %s" % (chosen_tool, arg))
 
                     # Verify that the requested tool exists in the available tools list.
                     # If not found, set an appropriate response and continue.
