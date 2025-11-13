@@ -11,9 +11,13 @@ import os
 from mcp.server.fastmcp import FastMCP
 from agent_malicious_ip_detection.agent import EnhancedAgent
 
+from agent_system_prompts.agent_system_prompts import *
+
+ip_agent = EnhancedAgent(system=system_prompt_malicious_ip_detector)
+
 mcp = FastMCP("MaliciousIpDetection")
 @mcp.tool()
-def add(a: int, b: int) -> int:
+def malicious_ip_detector(a: int, b: int) -> int:
     """Malicious IP Detection"""
     return a + b
 
