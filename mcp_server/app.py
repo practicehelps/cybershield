@@ -9,6 +9,7 @@ import os
 
 # math_server.py
 from mcp.server.fastmcp import FastMCP
+from agent_malicious_ip_detection.agent import EnhancedAgent
 
 mcp = FastMCP("MaliciousIpDetection")
 @mcp.tool()
